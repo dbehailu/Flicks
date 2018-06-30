@@ -1,6 +1,7 @@
 package com.codepath.flicks;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -14,11 +15,13 @@ import com.codepath.flicks.models.Config;
 import com.codepath.flicks.models.GlideApp;
 import com.codepath.flicks.models.Movie;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>  {
 
     ArrayList<Movie> movies;
     Config config;
@@ -73,7 +76,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return movies.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView ivPosterImage;
         ImageView ivBackdropImage;
@@ -84,8 +87,27 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             super(itemView);
             ivPosterImage = (ImageView) itemView.findViewById(R.id.ivPosterImage);
             ivBackdropImage = (ImageView) itemView.findViewById(R.id.ivBackdropImage);
-            tvOverview = (TextView) itemView.findViewById(R.id.tvOverview);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvOverview = (TextView) itemView.findViewById(R.id.tvOverview);
+            // add this as the itemView's OnClickListener
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            // gets item position
+            int position = getAdapterPosition();
+            // make sure the position is valid, i.e. actually exists in the view
+            if (position != RecyclerView.NO_POSITION) {
+                // get the movie at the position, this won't work if the class is static
+                Movie movie = movies.get(position);
+                // create intent for the new activity
+                Intent intent = new Intent(context, MovieDetailsActivity.class);
+                // serialize the movie using parceler, use its short name as a key
+                intent.putExtra(Movie.class.getSimpleName(), Parcels.wrap(movie));
+                // show the activity
+                context.startActivity(intent);
+            }
         }
     }
 }
